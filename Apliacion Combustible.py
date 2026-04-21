@@ -8,8 +8,9 @@ from io import BytesIO
 # Configuración de la página
 st.set_page_config(page_title="Fuel Analysis Pro", layout="wide")
 
-st.title("⛽ Professional fuel consumption analyzer")
+st.title("⛽ Professional fuel consumption analyzer | HP pumps")
 st.markdown("Please upload your telemetry CSV file to process the pump data")
+st.markdown("Powered by: Jose Gramcko")
 
 # --- BARRA LATERAL (Controles) ---
 st.sidebar.header("Visualization settings")
