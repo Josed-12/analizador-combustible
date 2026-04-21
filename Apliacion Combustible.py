@@ -92,7 +92,7 @@ if uploaded_file is not None and plot_button:
         fig_time.add_trace(go.Bar(x=blocks['Mid_Time'], y=blocks['Total_Volume_L'], width=blocks['Width_MS'],
                                   marker_color=blocks['Color'], text=blocks['Total_Volume_L'].round(0),
                                   textposition='auto'), row=2, col=1)
-        y_title = "Total Liters per block"
+        y_title = "Total Liters per stage"
 
     fig_time.update_layout(height=600, template='plotly_white', showlegend=False)
     fig_time.update_yaxes(title_text="L/h", row=1, col=1)
