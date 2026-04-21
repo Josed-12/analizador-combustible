@@ -16,7 +16,7 @@ st.markdown("Powered by: Jose Gramcko")
 st.sidebar.header("Visualization settings")
 uploaded_file = st.sidebar.file_uploader("1. Upload your CSV file", type=["csv"])
 mode = st.sidebar.selectbox("2. Analysis type", ["Per stage (Blocks)", "Per minute"])
-threshold = st.sidebar.number_input("Stage threshold (L/h) (", value=3500)
+threshold = st.sidebar.number_input("Stage threshold (L/h)", value=3500)
 plot_button = st.sidebar.button("Plot it!")
 
 
