@@ -8,15 +8,15 @@ from io import BytesIO
 # Configuración de la página
 st.set_page_config(page_title="Fuel Analysis Pro", layout="wide")
 
-st.title("⛽ Analizador Profesional de Consumo de Combustible")
-st.markdown("Sube tu archivo CSV de telemetría para procesar los datos de las bombas.")
+st.title("⛽ Professional fuel consumption analyzer")
+st.markdown("Please upload your telemetry CSV file to process the pump data")
 
 # --- BARRA LATERAL (Controles) ---
-st.sidebar.header("Configuración de Visualización")
-uploaded_file = st.sidebar.file_uploader("1. Sube tu archivo CSV", type=["csv"])
-mode = st.sidebar.selectbox("2. Tipo de Análisis", ["Por Stage (Bloques Completos)", "Minuto a Minuto"])
-threshold = st.sidebar.number_input("Umbral de Stage (L/h)", value=3500)
-plot_button = st.sidebar.button("¡Graficar ahora! (Plot it!)")
+st.sidebar.header("Visualization settings")
+uploaded_file = st.sidebar.file_uploader("1. Upload your CSV file", type=["csv"])
+mode = st.sidebar.selectbox("2. Analysis type", ["Per stage (Blocks)", "Per minute"])
+threshold = st.sidebar.number_input("Stage threshold (L/h) (", value=3500)
+plot_button = st.sidebar.button("Plot it!")
 
 
 # --- FUNCIONES DE PROCESAMIENTO ---
@@ -44,13 +44,13 @@ if uploaded_file is not None and plot_button:
     df = process_data(uploaded_file)
 
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1,
-                        subplot_titles=("Tasa de Consumo Instantánea (L/h)", "Análisis Acumulado"))
+                        subplot_titles=("Instant fuel consumption (L/h)", "Fuel volume consumed (L)"))
 
     # Gráfica Superior (Siempre flujo continuo)
     fig.add_trace(go.Scatter(x=df['timestamp'], y=df['Total_L_h'], name='Flujo L/h',
                              line=dict(color='firebrick', width=1.5), fill='tozeroy'), row=1, col=1)
 
-    if mode == "Minuto a Minuto":
+    if mode == "Per minute":
         # Lógica Minuto a Minuto
         resampled = df.set_index('timestamp')['Total_L_h'].resample('1min').mean().to_frame()
         resampled['Volume_L'] = resampled['Total_L_h'] / 60.0
@@ -58,7 +58,7 @@ if uploaded_file is not None and plot_button:
 
         fig.add_trace(go.Bar(x=resampled.index, y=resampled['Volume_L'], marker_color=resampled['Color'],
                              name='Litros/Min'), row=2, col=1)
-        y_title = "Litros por Minuto"
+        y_title = "Liters per minute"
 
     else:
         # Lógica Por Stage (Bloques)
@@ -79,7 +79,7 @@ if uploaded_file is not None and plot_button:
         fig.add_trace(go.Bar(x=blocks['Mid_Time'], y=blocks['Total_Volume_L'], width=blocks['Width_MS'],
                              marker_color=blocks['Color'], text=blocks['Total_Volume_L'].round(0),
                              textposition='auto', name='Total Litros'), row=2, col=1)
-        y_title = "Litros Totales del Evento"
+        y_title = "Total volume consumed per stage/idle"
 
     # Estética del Gráfico
     fig.update_layout(height=700, template='plotly_white', showlegend=False)
@@ -90,7 +90,7 @@ if uploaded_file is not None and plot_button:
     st.plotly_chart(fig, use_container_width=True)
 
     # --- DESCARGAS CORREGIDAS ---
-    st.subheader("📥 Exportar Resultados")
+    st.subheader("📥 Export results")
     col1, col2 = st.columns(2)
 
     # 1. Generar el HTML como texto directamente
@@ -98,13 +98,13 @@ if uploaded_file is not None and plot_button:
 
     # 2. Botón de descarga de HTML
     col1.download_button(
-        label="Descargar como HTML interactivo",
+        label="Download as dynamic .html file",
         data=html_string,
-        file_name="analisis_combustible.html",
+        file_name="fuel_analysis.html",
         mime="text/html"
     )
 
     # 3. Opción de PDF simplificada
     with col2:
         st.info(
-            "💡 **Tip para PDF:** Para una calidad profesional, haz clic en el icono de la cámara (📷) sobre la gráfica para bajarla como imagen, o presiona `Ctrl + P` en tu teclado y selecciona 'Guardar como PDF'.")
+            "💡 **PDF Tip: For professional quality, click the camera icon (📷) above the chart to download it as an image, or press Ctrl + P on your keyboard and select 'Save as PDF'.")
